@@ -1,13 +1,16 @@
 #include "networkUtils.h"
+#include "configs/networks.h"
 
-String URLEncode(const char* msg){
+WiFiClient client;
+
+String URLEncode(const char *msg) {
     const char *hex = "0123456789abcdef";
     String encodedMsg = "";
 
-    while (*msg!='\0'){
-        if( ('a' <= *msg && *msg <= 'z')
+    while (*msg != '\0') {
+        if (('a' <= *msg && *msg <= 'z')
             || ('A' <= *msg && *msg <= 'Z')
-            || ('0' <= *msg && *msg <= '9') ) {
+            || ('0' <= *msg && *msg <= '9')) {
             encodedMsg += *msg;
         } else {
             encodedMsg += '%';
@@ -19,24 +22,17 @@ String URLEncode(const char* msg){
     return encodedMsg;
 }
 
-void WiFiConnect(){
+void WiFiConnect() {
     while (WiFi.status() != WL_CONNECTED);
 }
 
-bool connect(){
-    if(client.connect(host, port)){
-        con = true;
-        return true;
+void connectToDB() {
+    if (!client.connected()) {
+        client.connect(host, port);
     }
-    else
-        return false;
 }
 
-void connectToDB(){
-    while(!connect()){};
-}
-
-void sendResponse(String message){
+int sendUid(String message) {
     client.println("POST /checkin HTTP/1.1");
     client.println("Host: " + String(host) + ":" + port);
     client.println("Content-Type: application/x-www-form-urlencoded");
@@ -45,4 +41,5 @@ void sendResponse(String message){
     client.println(message.length());
     client.println();
     client.println(message);
+    return client.read();
 }
