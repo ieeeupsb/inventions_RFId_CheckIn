@@ -44,3 +44,5 @@ configs.json
 server/config\.json
 
 reader/src/secrets.h
+
+reader/src/configs/
